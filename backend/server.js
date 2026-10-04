@@ -19,7 +19,6 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-
 // ==============================
 // HOME
 // ==============================
@@ -29,7 +28,6 @@ app.get("/", (req, res) => {
     message: "Project Management Tool Backend is running!"
   });
 });
-
 
 // ==============================
 // AUTHENTICATION
@@ -74,10 +72,69 @@ app.post("/api/auth/register", async (req, res) => {
         email: savedUser.email
       }
     });
-
   } catch (error) {
     res.status(500).json({
       message: "Registration failed",
+      error: error.message
+    });
+  }
+});
+
+// LOGIN USER
+app.post("/api/auth/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Email and password are required"
+      });
+    }
+
+    const user = await User.findOne({
+      email: email.toLowerCase()
+    });
+
+    if (!user) {
+      return res.status(401).json({
+        message: "Invalid email or password"
+      });
+    }
+
+    const passwordMatch = await bcrypt.compare(
+      password,
+      user.password
+    );
+
+    if (!passwordMatch) {
+      return res.status(401).json({
+        message: "Invalid email or password"
+      });
+    }
+
+    const token = jwt.sign(
+      {
+        id: user._id,
+        email: user.email
+      },
+      process.env.JWT_SECRET || "project_management_secret_2026",
+      {
+        expiresIn: "1d"
+      }
+    );
+
+    res.json({
+      message: "Login successful",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Login failed",
       error: error.message
     });
   }
@@ -103,7 +160,6 @@ app.post("/api/projects", async (req, res) => {
   }
 });
 
-
 // GET ALL PROJECTS
 app.get("/api/projects", async (req, res) => {
   try {
@@ -119,7 +175,6 @@ app.get("/api/projects", async (req, res) => {
     });
   }
 });
-
 
 // ==============================
 // TASK APIs
@@ -141,7 +196,6 @@ app.post("/api/tasks", async (req, res) => {
   }
 });
 
-
 // GET ALL TASKS
 app.get("/api/tasks", async (req, res) => {
   try {
@@ -159,7 +213,6 @@ app.get("/api/tasks", async (req, res) => {
     });
   }
 });
-
 
 // UPDATE TASK STATUS
 app.put("/api/tasks/:id/status", async (req, res) => {
@@ -195,10 +248,12 @@ app.put("/api/tasks/:id/status", async (req, res) => {
 
     const progress =
       projectTasks.length > 0
-        ? Math.round((completedTasks / projectTasks.length) * 100)
+        ? Math.round(
+            (completedTasks / projectTasks.length) * 100
+          )
         : 0;
 
-    // Update the project's progress
+    // Update project progress
     await Project.findByIdAndUpdate(
       updatedTask.projectId,
       {
@@ -238,7 +293,6 @@ app.post("/api/comments", async (req, res) => {
   }
 });
 
-
 // GET COMMENTS FOR A TASK
 app.get("/api/comments/:taskId", async (req, res) => {
   try {
@@ -256,7 +310,6 @@ app.get("/api/comments/:taskId", async (req, res) => {
     });
   }
 });
-
 
 // ==============================
 // MONGODB CONNECTION
