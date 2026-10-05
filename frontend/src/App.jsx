@@ -41,7 +41,7 @@ function App() {
   const fetchProjects = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/projects"
+        "https://codealpha-projectflow-backend.onrender.com/api/projects"
       );
 
       const data = await response.json();
@@ -63,7 +63,7 @@ function App() {
   const fetchTasks = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/tasks"
+        "https://codealpha-projectflow-backend.onrender.com/api/tasks"
       );
 
       const data = await response.json();
@@ -89,7 +89,7 @@ function App() {
   const fetchComments = async (taskId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/comments/${taskId}`
+        `https://codealpha-projectflow-backend.onrender.com/api/comments/${taskId}`
       );
 
       const data = await response.json();
@@ -149,7 +149,7 @@ function App() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/projects",
+        "https://codealpha-projectflow-backend.onrender.com/api/projects",
         {
           method: "POST",
           headers: {
@@ -198,7 +198,7 @@ function App() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/tasks",
+        "https://codealpha-projectflow-backend.onrender.com/api/tasks",
         {
           method: "POST",
           headers: {
@@ -242,7 +242,7 @@ function App() {
   const handleStatusChange = async (taskId, newStatus) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/tasks/${taskId}/status`,
+        `https://codealpha-projectflow-backend.onrender.com/api/tasks/${taskId}/status`,
         {
           method: "PUT",
           headers: {
@@ -307,7 +307,7 @@ await fetchProjects();
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/comments",
+        https://codealpha-projectflow-backend.onrender.com
         {
           method: "POST",
           headers: {
@@ -1073,3 +1073,4 @@ await fetchProjects();
 }
 
 export default App;
+
