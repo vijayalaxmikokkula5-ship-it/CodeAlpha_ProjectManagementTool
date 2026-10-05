@@ -1,58 +1,51 @@
 import { useState } from "react";
 
+const API_URL = "https://codealpha-projectflow-backend.onrender.com";
+
 function Auth({ onLogin }) {
   const [isLogin, setIsLogin] = useState(true);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: ""
-  });
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-const url = isLogin
-  ? "https://codealpha-projectflow-backend.onrender.com/api/auth/login"
-  : "https://codealpha-projectflow-backend.onrender.com/api/auth/register";
     try {
-      const response = await fetch(url, {
+      const endpoint = isLogin
+        ? "/api/auth/login"
+        : "/api/auth/register";
+
+      const response = await fetch(`${API_URL}${endpoint}`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(form)
+        body: JSON.stringify(
+          isLogin
+            ? {
+                email,
+                password,
+              }
+            : {
+                name,
+                email,
+                password,
+              }
+        ),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Something went wrong");
+        throw new Error(data.message || "Authentication failed");
       }
 
-      if (isLogin) {
+      if (data.token) {
         localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-
-        alert("Login successful!");
-        onLogin(data.user);
-      } else {
-        alert("Registration successful! Please login.");
-
-        setIsLogin(true);
-
-        setForm({
-          name: "",
-          email: form.email,
-          password: ""
-        });
       }
+
+      onLogin(data);
     } catch (error) {
       alert(error.message);
     }
@@ -62,74 +55,44 @@ const url = isLogin
     <div className="auth-page">
       <div className="auth-card">
         <h1>ProjectFlow</h1>
-
-        <h2>
-          {isLogin ? "Welcome Back" : "Create Account"}
-        </h2>
-
-        <p>
-          {isLogin
-            ? "Login to manage your projects and tasks."
-            : "Create your ProjectFlow account."}
-        </p>
+        <p>{isLogin ? "Login to your account" : "Create your account"}</p>
 
         <form onSubmit={handleSubmit}>
           {!isLogin && (
-            <>
-              <label>Name</label>
-
-              <input
-                type="text"
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                placeholder="Enter your name"
-                required
-              />
-            </>
+            <input
+              type="text"
+              placeholder="Name"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              required
+            />
           )}
-
-          <label>Email</label>
 
           <input
             type="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            placeholder="Enter your email"
+            placeholder="Email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
             required
           />
-
-          <label>Password</label>
 
           <input
             type="password"
-            name="password"
-            value={form.password}
-            onChange={handleChange}
-            placeholder="Enter your password"
+            placeholder="Password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
             required
           />
 
-          <button
-            type="submit"
-            className="create-btn"
-          >
+          <button type="submit">
             {isLogin ? "Login" : "Register"}
           </button>
         </form>
 
         <button
+          type="button"
           className="auth-switch"
-          onClick={() => {
-            setIsLogin(!isLogin);
-
-            setForm({
-              name: "",
-              email: "",
-              password: ""
-            });
-          }}
+          onClick={() => setIsLogin(!isLogin)}
         >
           {isLogin
             ? "Don't have an account? Register"
@@ -141,4 +104,3 @@ const url = isLogin
 }
 
 export default Auth;
-

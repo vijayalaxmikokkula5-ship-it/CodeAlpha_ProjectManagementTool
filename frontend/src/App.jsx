@@ -304,13 +304,12 @@ await fetchProjects();
       alert("Please enter a comment.");
       return;
     }
-
-    try {
-      const response = await fetch(
-        https://codealpha-projectflow-backend.onrender.com
-        {
-          method: "POST",
-          headers: {
+try {
+  const response = await fetch(
+    "https://codealpha-projectflow-backend.onrender.com/api/comments",
+    {
+      method: "POST",
+      headers: {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
